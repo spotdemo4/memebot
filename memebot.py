@@ -15,10 +15,10 @@ import re
 import config
 
 class Video:
-    def __init__(self, url, spoiler, preserve, text):
+    def __init__(self, url, spoiler, meme, text):
         self.url = url
         self.spoiler = spoiler
-        self.preserve = preserve
+        self.meme = meme
         self.text = text
 
         # Download video
@@ -33,6 +33,10 @@ class Video:
                 genfile = "./memes/SPOILER_" + str(random.randint(0, 1000000))
             else:
                 genfile = "./memes/" + str(random.randint(0, 1000000))
+        
+        # Get rid of text if meme
+        if meme:
+            self.text = ''
 
         downloadVid(genfile, url)
 
@@ -112,16 +116,17 @@ class Video:
         print("[deleted] " + self.filename)
         os.remove(self.filepath)
 
-    async def upload(self, message):
+    async def upload(self, message = None, interaction = None):
         print("[upload] " + self.filename)
 
-        if self.preserve == False and "discordapp" not in self.url:
-            self.text = "<" + self.url + "> " + self.text
-
-        msg = await message.channel.send(self.text, file=discord.File(self.filepath))
+        if message:
+            msg = await message.channel.send(self.text, file=discord.File(self.filepath))
+        
+        if interaction:
+            msg = await interaction.followup.send(self.text, file=discord.File(self.filepath))
 
         # Test if delete video file
-        if self.preserve == False:
+        if self.meme == False:
             self.delete()
 
         return msg
@@ -188,7 +193,7 @@ async def processMessage(message, caption=False):
         else:
             meme = False
 
-        video = Video(url, spoiler, meme, url)
+        video = Video(url, spoiler, meme, text)
     except Exception as ex:
         await sendError(message.author, "[ERROR] Download error: " + str(ex))
         return
@@ -215,7 +220,7 @@ async def processMessage(message, caption=False):
 
     # Uploads file
     try:
-        msg = await video.upload(message)
+        msg = await video.upload(message=message)
 
     # If file too big
     except discord.errors.HTTPException as ex:
@@ -280,9 +285,7 @@ async def processInteraction(interaction, url, spoiler, caption=False):
 
     # Uploads file
     try:
-        await interaction.followup.send(video.text, file=discord.File(video.filepath))
-        if(not meme):
-            video.delete()
+        video.upload(interaction=interaction)
 
     # If file too big
     except discord.errors.HTTPException as ex:
@@ -355,20 +358,13 @@ async def on_message(message):
     # don't respond to ourselves
     if message.author == client.user:
         return
-    elif "!geturl" in message.content:
-        url = re.search(
-            "(?P<url>https?://[^\\s]+)", message.content).group("url")
-        await message.channel.send(getURL(url))
     elif "!getprofilepic" in message.content:
         await message.author.send(message.author.avatar_url)
-    elif "!caption" in message.content:
-        await processMessage(message, True)
     elif "youtube.com/watch?v=" in message.content or "youtu.be/" in message.content:
         if message.channel.id == config.MEME_CHANNEL_ID or "!dl" in message.content:
             await processMessage(message)
     elif any(ele in message.content for ele in config.FILTERS):
         await processMessage(message)
-
 
 client.run(config.DISCORD_API_KEY)
 print("Success")
