@@ -116,14 +116,14 @@ class Video:
         print("[deleted] " + self.filename)
         os.remove(self.filepath)
 
-    async def upload(self, message = None, interaction = None):
+    def upload(self, message = None, interaction = None):
         print("[upload] " + self.filename)
 
         if message:
-            msg = await message.channel.send(self.text, file=discord.File(self.filepath))
+            msg = message.channel.send(self.text, file=discord.File(self.filepath))
         
         if interaction:
-            msg = await interaction.followup.send(self.text, file=discord.File(self.filepath))
+            msg = interaction.followup.send(self.text, file=discord.File(self.filepath))
 
         # Test if delete video file
         if self.meme == False:
@@ -285,7 +285,7 @@ async def processInteraction(interaction, url, spoiler, caption=False):
 
     # Uploads file
     try:
-        video.upload(interaction=interaction)
+        await video.upload(interaction=interaction)
 
     # If file too big
     except discord.errors.HTTPException as ex:
