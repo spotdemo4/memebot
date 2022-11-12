@@ -139,6 +139,8 @@ def downloadVid(filename, url):
         url = subprocess.run(["curl", "-o", "/dev/null", "--silent", url, "-w", "'%{redirect_url}'"], stdout=subprocess.PIPE).stdout.decode('utf-8')[1:-1]
         print("TIKTOK REDIRECT URL: " + url)
         ydl_opts = {'outtmpl': filename + '.%(ext)s'}
+    elif "youtu.be" in url or "youtube.com/watch?v=" in url:
+        ydl_opts = {'outtmpl': filename + '.%(ext)s', 'format': '[height<=720]'}
     else:
         ydl_opts = {'outtmpl': filename + '.%(ext)s'}
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
