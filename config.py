@@ -3,7 +3,7 @@ FILTERS = ["twitter.com/", "vm.tiktok.com/", "reddit.com/r/",
            "!dl", "discordapp", "redd.it/", "ifunny.co/", "instagram.com/", "tiktok.com/"]
 
 # Discord bot API key
-DISCORD_API_KEY = 'NzQ2MTM0MTU2MzkxNjEyNTY4.Xz75lQ.2kEKosUZq5ZEQDKyCSTgkNW8LBc'
+DISCORD_API_KEY = ''
 
 # User ID & emoji ID to react to videos
 USER_EMOJIS = [("107300949189513216", 639322471656587265),
