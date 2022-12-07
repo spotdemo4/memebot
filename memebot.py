@@ -245,7 +245,8 @@ async def processMessage(message, caption=False):
         authorid = str(message.author.id)
         for user in config.USER_EMOJIS:
             if(authorid == user[0]):
-                await msg.add_reaction(user[1])
+                emoji = await msg.guild.fetch_emoji(user[1])
+                await msg.add_reaction(emoji)
 
 async def processInteraction(interaction, url, spoiler, caption=False):
     # Get URL
