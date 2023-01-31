@@ -1,6 +1,6 @@
 # Keywords to auto-download videos
-FILTERS = ["twitter.com/", "vm.tiktok.com/", "reddit.com/r/",
-           "!dl", "discordapp", "redd.it/", "ifunny.co/", "instagram.com/", "tiktok.com/"]
+FILTERS = ["twitter.com/", "vm.tiktok.com/", "reddit.com/r/", "!dl", "discordapp", "redd.it/",
+           "ifunny.co/", "instagram.com/", "tiktok.com/", "twitch.tv/clip", "youtube.com/shorts", "youtube.com/clip"]
 
 # Discord bot API key
 DISCORD_API_KEY = ''
@@ -27,3 +27,6 @@ MEME_CHANNEL_ID = 150459222637805570
 
 # Guild ID
 GUILD_ID = 104979971667197952
+
+# Remote upload url
+REMOTE_UPLOAD_URL = "https://p.trev.xyz/api/guest/BrPGQKsQo7A44kTE"

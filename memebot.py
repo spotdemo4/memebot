@@ -13,6 +13,7 @@ import subprocess
 import ffmpeg
 import re
 import config
+import json
 
 class Video:
     def __init__(self, url, spoiler, meme, text):
@@ -74,7 +75,8 @@ class Video:
         self.filename = self.filename.split('.')[0] + "0." + self.fileext
         self.filepath = "." + self.filepath.split('.')[1] + "0." + self.fileext
         try:
-            ffvideo = ffmpeg.output(video, self.filepath, crf=30, vf='scale=-2:ih/2', format='mp4').global_args('-loglevel', 'error')
+            #ffvideo = ffmpeg.output(video, self.filepath, crf=32, vf='scale=-2:ih/2', format='mp4').global_args('-loglevel', 'error')
+            ffvideo = ffmpeg.output(video, self.filepath, crf=30, format='mp4').global_args('-loglevel', 'error')
             ffmpeg.run(ffvideo)
         except ffmpeg.Error as e:
             print("FFmpeg error, retrying...")
@@ -125,11 +127,16 @@ class Video:
         if interaction:
             msg = interaction.followup.send(self.text, file=discord.File(self.filepath))
 
-        # Test if delete video file
-        if self.meme == False:
-            self.delete()
-
         return msg
+    
+    def uploadRemote(self):
+        print("[upload remote] " + self.filename)
+
+        weirdchars = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
+        url = subprocess.run(["curl", "-F", "file=@" + self.filepath, config.REMOTE_UPLOAD_URL], stdout=subprocess.PIPE).stdout.decode('utf-8')
+        formattedUrl = json.loads(url)
+
+        return weirdchars + " https://p.trev.xyz/-" + formattedUrl["id"] + "/" + self.filename
 
 def downloadVid(filename, url):
     yt_dlp.utils.std_headers['User-Agent'] = 'facebookexternalhit/1.1'
@@ -226,7 +233,7 @@ async def processMessage(message, caption=False):
 
     # If file too big
     except discord.errors.HTTPException as ex:
-        await sendError(message.author, "[ERROR] File too big after convert: " + str(ex))
+        message.channel.send(video.uploadRemote())
         video.delete()
     except Exception as ex:
         await sendError(message.author, "[ERROR] Upload error: " + str(ex))
@@ -292,7 +299,7 @@ async def processInteraction(interaction, url, spoiler, caption=False):
 
     # If file too big
     except discord.errors.HTTPException as ex:
-        await interaction.followup.send("ERROR file too big after convert: " + str(ex), ephemeral=True)
+        await interaction.followup.send(video.uploadRemote())
         video.delete()
     except Exception as ex:
         await interaction.followup.send("ERROR upload error: " + str(ex), ephemeral=True)
