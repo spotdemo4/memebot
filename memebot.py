@@ -233,7 +233,7 @@ async def processMessage(message, caption=False):
 
     # If file too big
     except discord.errors.HTTPException as ex:
-        message.channel.send(video.uploadRemote())
+        msg = await message.channel.send(video.uploadRemote())
         video.delete()
     except Exception as ex:
         await sendError(message.author, "[ERROR] Upload error: " + str(ex))
