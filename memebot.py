@@ -14,6 +14,7 @@ import ffmpeg
 import re
 import config
 import json
+import time
 
 class Video:
     def __init__(self, url, spoiler, meme, text):
@@ -134,6 +135,7 @@ class Video:
 
         url = subprocess.run(["curl", "-F", "file=@" + self.filepath, config.REMOTE_UPLOAD_URL], stdout=subprocess.PIPE).stdout.decode('utf-8')
         formattedUrl = json.loads(url)
+        time.sleep(5)
 
         return "https://p.trev.xyz/-" + formattedUrl["id"] + "/" + self.filename
 
