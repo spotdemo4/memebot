@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  memebot:
+    build:
+      context: .
+    container_name: memebot
+    restart: unless-stopped
+    volumes:
+      - ./memes:/app/memes
