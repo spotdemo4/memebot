@@ -194,6 +194,12 @@ async def processMessage(message, caption=False):
     text = message.content.replace(url, "").replace(
         "!dl", "").replace("!caption", "").strip()
 
+    if message.type == discord.MessageType.reply:
+        new_message = await message.reference.resolved.reply(content=getLoadingEmoji() + " downloading")
+    else:
+        new_message = await message.channel.send(
+            content=getLoadingEmoji() + " downloading")
+
     # Download Video
     try:
         # Check if edgy/spoiler
@@ -205,12 +211,8 @@ async def processMessage(message, caption=False):
         # Check if meme
         if message.channel.id == config.MEME_CHANNEL_ID:
             meme = True
-            new_message = await message.channel.send(
-                content=getLoadingEmoji() + " downloading")
         else:
             meme = False
-            new_message = await message.reply(
-                content=getLoadingEmoji() + " downloading")
 
         video = Video(url, spoiler, meme, text)
     except Exception as ex:
