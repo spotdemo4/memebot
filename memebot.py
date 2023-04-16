@@ -14,7 +14,6 @@ import re
 import config
 import typing
 import functools
-import time
 
 
 class Video:
@@ -195,9 +194,6 @@ async def processMessage(message, caption=False):
     text = message.content.replace(url, "").replace(
         "!dl", "").replace("!caption", "").strip()
 
-    new_message = await message.channel.send(
-        content=getLoadingEmoji() + " downloading")
-
     # Download Video
     try:
         # Check if edgy/spoiler
@@ -209,8 +205,12 @@ async def processMessage(message, caption=False):
         # Check if meme
         if message.channel.id == config.MEME_CHANNEL_ID:
             meme = True
+            new_message = await message.channel.send(
+                content=getLoadingEmoji() + " downloading")
         else:
             meme = False
+            new_message = await message.reply(
+                content=getLoadingEmoji() + " downloading")
 
         video = Video(url, spoiler, meme, text)
     except Exception as ex:
@@ -230,8 +230,8 @@ async def processMessage(message, caption=False):
         await video.convertH264()
 
     # Makes sure video is correct size
-    if (os.path.getsize(video.filepath) > 8000000):
-        await new_message.edit(content=getLoadingEmoji() + "compressing")
+    if (os.path.getsize(video.filepath) > 25000000):
+        await new_message.edit(content=getLoadingEmoji() + " compressing")
         await video.compress()
 
     # Adds caption if true
@@ -308,12 +308,13 @@ async def processInteraction(interaction, url, spoiler, caption=False):
         await video.convertH264()
 
     # Makes sure video is correct size
-    if (os.path.getsize(video.filepath) > 8000000):
+    if (os.path.getsize(video.filepath) > 25000000):
         await interaction.edit_original_response(content=getLoadingEmoji() + " compressing")
         await video.compress()
 
     # Adds caption if true
     if (caption == True):
+        await interaction.edit_original_response(content=getLoadingEmoji() + " captioning")
         await video.addCaption()
 
     print("Downloaded " + video.filename + " to " + video.filepath)
