@@ -3,7 +3,7 @@ FILTERS = ["twitter.com/", "vm.tiktok.com/", "reddit.com/r/", "!dl", "discordapp
            "ifunny.co/", "instagram.com/", "tiktok.com/", "twitch.tv/clip", "youtube.com/shorts", "youtube.com/clip"]
 
 # Discord bot API key
-DISCORD_API_KEY = ''
+DISCORD_API_KEY = 'NzQ2MTM0MTU2MzkxNjEyNTY4.GSx7vN.PF9ww-Sxrir7tHqny5zEiSib1yNUKQhNSZiZHM'
 
 # User ID & emoji ID to react to videos
 USER_EMOJIS = [("107300949189513216", 639322471656587265),
@@ -14,19 +14,20 @@ USER_EMOJIS = [("107300949189513216", 639322471656587265),
                ("163872897767571456", 350860390500007936),
                ("269296454797885453", 813996648967569408),
                ("107549180053950464", 274323418315358208),
-               ("268878402054914048", 1049710414906277968)]
+               ("268878402054914048", 1049710414906277968),
+               ("630122749431382029", 1090276863034806342)]
 
 # Cookie file for yt_dlp, might be required for certain sites
 COOKIE_FILE = "./cookies.txt"
 
-# Admin user ID to recieve errors
-ADMIN_ID = 669341931415011378
-
 # Meme channel ID that will auto-download all URLs posted
 MEME_CHANNEL_ID = 150459222637805570
+SPOILER_CHANNEL_ID = 658455491118235648
 
 # Guild ID
 GUILD_ID = 104979971667197952
 
-# Remote upload url
-REMOTE_UPLOAD_URL = "https://p.trev.xyz/api/guest/BrPGQKsQo7A44kTE"
+# Backblaze
+KEY_ID = "005d239c64e2e890000000002"
+APPLICATION_KEY = "K005ixM++CYUGvkK++4xF5KVQO0gUX0"
+BUCKET_NAME = 'memebot'
