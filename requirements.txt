@@ -37,4 +37,3 @@ tqdm==4.65.0
 urllib3==1.26.15
 websockets==11.0.1
 yarl==1.8.2
-yt-dlp==2023.6.22
