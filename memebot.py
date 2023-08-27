@@ -1,6 +1,5 @@
 from ffprobe import FFProbe
 from moviepy.editor import *
-from b2sdk.v2 import *
 import yt_dlp
 import yt_dlp.utils
 import yt_dlp.version
@@ -133,13 +132,6 @@ class Video:
 
         return msg
 
-    def uploadRemote(self):
-        print("[upload remote] " + self.filename)
-
-        bucket.upload_local_file(self.filepath, self.filename)
-
-        return "https://cdn.trev.xyz/memebot/" + self.filename
-
 
 def downloadVid(filename, url):
     yt_dlp.utils.std_headers['User-Agent'] = 'facebookexternalhit/1.1'
@@ -249,11 +241,6 @@ async def processMessage(message, caption=False):
         await new_message.edit(content=getLoadingEmoji() + " uploading to Discord")
         msg = await video.upload(message=new_message)
 
-    # If file too big
-    except discord.errors.HTTPException as ex:
-        await new_message.edit(content=getLoadingEmoji() + " uploading to TrevCDN")
-        msg = await new_message.edit(content=video.uploadRemote())
-        video.delete()
     except Exception as ex:
         await new_message.edit(content=getErrorEmoji() + " error: " + str(ex))
         await new_message.delete(delay=30)
@@ -326,11 +313,6 @@ async def processInteraction(interaction, url, spoiler, caption=False):
         await interaction.edit_original_response(content=getLoadingEmoji() + " uploading to Discord")
         await video.upload(interaction=interaction)
 
-    # If file too big
-    except discord.errors.HTTPException as ex:
-        await interaction.edit_original_response(content=getLoadingEmoji() + " uploading to TrevCDN")
-        await interaction.edit_original_response(content=video.uploadRemote())
-        video.delete()
     except Exception as ex:
         await interaction.edit_original_response(content=getErrorEmoji() + " error: " + str(ex))
         video.delete()
@@ -378,13 +360,6 @@ intents.messages = True
 intents.message_content = True
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
-
-# Backblaze API
-info = InMemoryAccountInfo()
-b2 = B2Api(info)
-b2.authorize_account("production", config.KEY_ID, config.APPLICATION_KEY)
-bucket = b2.get_bucket_by_name(config.BUCKET_NAME)
-
 
 @tree.command(name="embed", description="embed video from URL", guild=discord.Object(id=config.GUILD_ID))
 async def on_slash_embed(interaction, url: str, spoiler: bool = False):
