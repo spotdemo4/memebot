@@ -1,5 +1,7 @@
 from ffprobe import FFProbe
 from moviepy.editor import *
+from html2image import Html2Image
+from PIL import Image
 import yt_dlp
 import yt_dlp.utils
 import yt_dlp.version
@@ -378,6 +380,18 @@ async def on_slash_embedtest(interaction, url: str):
     await interaction.response.defer(thinking=True)
     await processEmbed(interaction, url)
 
+@tree.command(name="twitter", description="embed twitter URL", guild=discord.Object(id=config.GUILD_ID))
+async def on_slash_twitter(interaction, url: str):
+    await interaction.response.defer(thinking=True)
+    better_url = url.split('?')[0]
+    twitter_id = url.split('/')[-1].split('?')[0]
+    hti = Html2Image(size=(500, 1100), custom_flags=['--virtual-time-budget=10000', '--hide-scrollbars', '--default-background-color=00000000', '--no-sandbox'])
+    img_paths = hti.screenshot(url=f'https://platform.twitter.com/embed/Tweet.html?dnt=true&embedId=twitter-widget-1&features=eyJ0ZndfdGltZWxpbmVfbGlzdCI6eyJidWNrZXQiOltdLCJ2ZXJzaW9uIjpudWxsfSwidGZ3X2ZvbGxvd2VyX2NvdW50X3N1bnNldCI6eyJidWNrZXQiOnRydWUsInZlcnNpb24iOm51bGx9LCJ0ZndfdHdlZXRfZWRpdF9iYWNrZW5kIjp7ImJ1Y2tldCI6Im9uIiwidmVyc2lvbiI6bnVsbH0sInRmd19yZWZzcmNfc2Vzc2lvbiI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9LCJ0ZndfZm9zbnJfc29mdF9pbnRlcnZlbnRpb25zX2VuYWJsZWQiOnsiYnVja2V0Ijoib24iLCJ2ZXJzaW9uIjpudWxsfSwidGZ3X21peGVkX21lZGlhXzE1ODk3Ijp7ImJ1Y2tldCI6InRyZWF0bWVudCIsInZlcnNpb24iOm51bGx9LCJ0ZndfZXhwZXJpbWVudHNfY29va2llX2V4cGlyYXRpb24iOnsiYnVja2V0IjoxMjA5NjAwLCJ2ZXJzaW9uIjpudWxsfSwidGZ3X3Nob3dfYmlyZHdhdGNoX3Bpdm90c19lbmFibGVkIjp7ImJ1Y2tldCI6Im9uIiwidmVyc2lvbiI6bnVsbH0sInRmd19kdXBsaWNhdGVfc2NyaWJlc190b19zZXR0aW5ncyI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9LCJ0ZndfdXNlX3Byb2ZpbGVfaW1hZ2Vfc2hhcGVfZW5hYmxlZCI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9LCJ0ZndfdmlkZW9faGxzX2R5bmFtaWNfbWFuaWZlc3RzXzE1MDgyIjp7ImJ1Y2tldCI6InRydWVfYml0cmF0ZSIsInZlcnNpb24iOm51bGx9LCJ0ZndfbGVnYWN5X3RpbWVsaW5lX3N1bnNldCI6eyJidWNrZXQiOnRydWUsInZlcnNpb24iOm51bGx9LCJ0ZndfdHdlZXRfZWRpdF9mcm9udGVuZCI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9fQ%3D%3D&frame=false&hideCard=false&hideThread=false&id={twitter_id}&lang=en&origin=https%3A%2F%2Fpublish.twitter.com%2F%23&sessionId=b88c7b43b2c23122b3bc5c8535f8df423edc977d&theme=dark&widgetsVersion=01917f4d1d4cb%3A1696883169554&width=550px', save_as='twitter.png')
+    img = Image.open(img_paths[0])
+    imageBox = img.getbbox()
+    cropped = img.crop(imageBox)
+    cropped.save(img_paths[0])
+    await interaction.followup.send(better_url, file=discord.File(img_paths[0]))
 
 @client.event
 async def on_ready():
@@ -403,18 +417,15 @@ async def on_raw_reaction_add(payload):
 
 @client.event
 async def on_message(message):
-    global lastmedia
-
-    # don't respond to ourselves
     if message.author == client.user:
         return
     elif "!getprofilepic" in message.content:
         await message.author.send(message.author.avatar_url)
-    elif "youtube.com/watch?v=" in message.content or "youtu.be/" in message.content:
-        if message.channel.id == config.MEME_CHANNEL_ID or "!dl" in message.content:
+    elif message.channel.id == config.MEME_CHANNEL_ID or "!dl" in message.content:
+        if "youtube.com/watch?v=" in message.content or "youtu.be/" in message.content:
             await processMessage(message)
-    elif any(ele in message.content for ele in config.FILTERS):
-        await processMessage(message)
+        elif any(ele in message.content for ele in config.FILTERS):
+            await processMessage(message)
 
 client.run(config.DISCORD_API_KEY)
 print("Success")
