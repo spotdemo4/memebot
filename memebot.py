@@ -391,7 +391,7 @@ async def on_slash_twitter(interaction, url: str):
     imageBox = img.getbbox()
     cropped = img.crop(imageBox)
     cropped.save(img_paths[0])
-    await interaction.followup.send(better_url, file=discord.File(img_paths[0]))
+    await interaction.followup.send('<' + better_url + '>', file=discord.File(img_paths[0]))
 
 @client.event
 async def on_ready():
